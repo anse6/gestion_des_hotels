@@ -1,0 +1,21 @@
+// Fichier: data.ts
+// Fichier: data.ts
+import type { OptionsData } from './types';
+
+export const reservationOptions: OptionsData = {
+  chambre: [
+    { id: 1, title: 'Chambre Deluxe', description: 'Chambre spacieuse avec vue panoramique, lit king-size et salle de bain privative en marbre.', price: '180€', imagePrompt: 'Luxurious hotel room with king size bed, panoramic windows with city view, elegant modern furniture, soft lighting, marble bathroom, neutral color palette with gold accents, high ceiling, plush carpet, minimalist decor, professional photography style, high end hotel atmosphere' },
+    { id: 2, title: 'Suite Junior', description: 'Suite élégante avec salon séparé, lit queen-size et balcon privé donnant sur le jardin.', price: '250€', imagePrompt: 'Elegant junior suite hotel room with separate living area, queen size bed, private balcony with garden view, sophisticated decor, warm lighting, wooden floors, beige and blue color scheme, high quality linens, minimalist modern furniture, professional hotel photography' },
+    { id: 3, title: 'Chambre Standard', description: 'Chambre confortable avec lit double, bureau de travail et salle de bain moderne.', price: '120€', imagePrompt: 'Standard hotel room with double bed, work desk, modern bathroom, clean design, neutral colors, ambient lighting, wooden headboard, crisp white linens, contemporary furniture, large windows, minimalist decor, professional photography, comfortable atmosphere' }
+  ],
+  salle: [
+    { id: 1, title: 'Grande Salle de Réception', description: 'Espace élégant pouvant accueillir jusqu\'à 200 personnes avec piste de danse et scène pour orchestre.', price: '1200€', imagePrompt: 'Elegant large reception hall with dance floor, stage for orchestra, crystal chandeliers, high ceilings, luxurious decor, round tables with white tablecloths, golden chairs, ambient lighting, marble floors, grand pillars, sophisticated atmosphere, professional event venue photography' },
+    { id: 2, title: 'Salon Privé', description: 'Espace intime idéal pour les petites célébrations jusqu\'à 50 personnes avec terrasse privée.', price: '650€', imagePrompt: 'Intimate private event room with terrace, elegant setup for 50 people, soft lighting, modern decor, floor to ceiling windows, stylish furniture, floral arrangements, wooden floors, neutral color palette, sophisticated atmosphere, professional venue photography' },
+    { id: 3, title: 'Salle de Conférence', description: 'Salle polyvalente adaptée aux événements professionnels et familiaux avec équipement audiovisuel.', price: '800€', imagePrompt: 'Versatile conference room with audiovisual equipment, elegant setup for both professional and family events, modern design, large projection screen, comfortable seating, natural lighting, wooden accents, professional atmosphere, high quality venue photography' }
+  ],
+  appartement: [
+    { id: 1, title: 'Appartement Familial', description: 'Spacieux 3 pièces avec cuisine équipée, salon confortable et deux chambres séparées.', price: '320€', imagePrompt: 'Spacious family apartment with fully equipped kitchen, comfortable living room, two separate bedrooms, modern furniture, large windows, wooden floors, neutral colors with colorful accents, stylish decor, bright atmosphere, professional real estate photography' },
+    { id: 2, title: 'Studio de Luxe', description: 'Studio moderne avec lit king-size, coin salon et kitchenette entièrement équipée.', price: '180€', imagePrompt: 'Luxury studio apartment with king size bed, sitting area, fully equipped kitchenette, modern design, large windows, city view, wooden floors, elegant furniture, ambient lighting, minimalist decor, sophisticated atmosphere, professional real estate photography' },
+    { id: 3, title: 'Penthouse', description: 'Appartement de prestige au dernier étage avec terrasse panoramique et jacuzzi privé.', price: '550€', imagePrompt: 'Prestigious penthouse apartment with panoramic terrace and private jacuzzi, luxury interior, floor to ceiling windows, designer furniture, open plan living area, high end kitchen, master bedroom, elegant bathroom, city skyline views, professional luxury real estate photography' }
+  ]
+};
