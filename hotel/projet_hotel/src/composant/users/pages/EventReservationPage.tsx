@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import Header from '../composant/Header';
 import Footer from '../composant/Footer';
-import EventPaymentModal from './EventPaymentModal';  
+import EventPaymentModal from './EventPaymentModal';
 
 type EventReservationData = {
   event_room_id: number;
@@ -129,35 +128,41 @@ const EventReservationPage: React.FC = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Erreur lors de la réservation');
+        // CORRECTION: Vérifier d'abord 'error', puis 'message', puis un message par défaut
+        throw new Error(errorData.error || errorData.message || 'Une erreur est survenue lors de la réservation.');
       }
 
       const reservationData = await response.json();
       setReservationId(reservationData.id);
       setShowPaymentModal(true);
-      
+
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Une erreur est survenue');
+      // S'assurer que 'err' est bien une instance de Error avant d'accéder à 'message'
+      setError(err instanceof Error ? err.message : 'Une erreur inattendue est survenue.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handlePaymentSuccess = () => {
-    navigate('/confirmation-evenement', { 
-      state: { 
-        reservation: formData, 
+    navigate('/confirmation-evenement', {
+      state: {
+        reservation: formData,
         space,
         reservationId,
         prixTotal: totalPrice,
         statut: 'confirmée'
-      } 
+      }
     });
   };
 
   const handlePaymentCancel = () => {
     setShowPaymentModal(false);
   };
+
+  // Classes TailwindCSS pour la bordure bleue et le style professionnel
+  const commonInputClasses = "w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 border-blue-400 text-gray-800 placeholder-gray-400";
+  const datePickerClasses = "w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 border-blue-400 appearance-none date-input-style text-gray-800"; // Added appearance-none for potential custom styling hooks
 
   return (
     <>
@@ -168,7 +173,7 @@ const EventReservationPage: React.FC = () => {
             <h1 className="text-2xl font-bold text-gray-800 mb-6">
               Réservation - {space?.name || 'Salle #' + roomId}
             </h1>
-            
+
             {error && (
               <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6">
                 <p>{error}</p>
@@ -178,57 +183,61 @@ const EventReservationPage: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="nom" className="block text-sm font-medium text-gray-700 mb-2">
                     Nom
                   </label>
                   <input
                     type="text"
+                    id="nom"
                     name="nom"
                     value={formData.nom}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    className={commonInputClasses}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="prenom" className="block text-sm font-medium text-gray-700 mb-2">
                     Prénom
                   </label>
                   <input
                     type="text"
+                    id="prenom"
                     name="prenom"
                     value={formData.prenom}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    className={commonInputClasses}
                     required
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                   Email
                 </label>
                 <input
                   type="email"
+                  id="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                  className={commonInputClasses}
                   required
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="type_evenement" className="block text-sm font-medium text-gray-700 mb-2">
                     Type d'événement
                   </label>
                   <select
+                    id="type_evenement"
                     name="type_evenement"
                     value={formData.type_evenement}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    className={commonInputClasses}
                     required
                   >
                     {eventTypes.map(type => (
@@ -239,15 +248,16 @@ const EventReservationPage: React.FC = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="date_evenement" className="block text-sm font-medium text-gray-700 mb-2">
                     Date de l'événement
                   </label>
                   <input
                     type="date"
+                    id="date_evenement"
                     name="date_evenement"
                     value={formData.date_evenement}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    className={datePickerClasses}
                     required
                     min={new Date().toISOString().split('T')[0]}
                   />
@@ -256,31 +266,89 @@ const EventReservationPage: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="heure_debut" className="block text-sm font-medium text-gray-700 mb-2">
                     Heure de début
                   </label>
                   <input
                     type="time"
+                    id="heure_debut"
                     name="heure_debut"
                     value={formData.heure_debut}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    className={datePickerClasses}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="heure_fin" className="block text-sm font-medium text-gray-700 mb-2">
                     Heure de fin
                   </label>
                   <input
                     type="time"
+                    id="heure_fin"
                     name="heure_fin"
                     value={formData.heure_fin}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    className={datePickerClasses}
                     required
                   />
                 </div>
+              </div>
+              <div>
+                <label htmlFor="nombre_invites" className="block text-sm font-medium text-gray-700 mb-2">
+                  Nombre d'invités
+                </label>
+                <input
+                  type="number"
+                  id="nombre_invites"
+                  name="nombre_invites"
+                  value={formData.nombre_invites}
+                  onChange={handleChange}
+                  min="1"
+                  max={space?.capacity || 500}
+                  className={commonInputClasses}
+                  required
+                />
+                {space && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    Capacité maximale: {space.capacity} personnes
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="methode_paiement" className="block text-sm font-medium text-gray-700 mb-2">
+                  Méthode de paiement
+                </label>
+                <select
+                  id="methode_paiement"
+                  name="methode_paiement"
+                  value={formData.methode_paiement}
+                  onChange={handleChange}
+                  className={commonInputClasses}
+                  required
+                >
+                  {paymentMethods.map(method => (
+                    <option key={method} value={method}>
+                      {method}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
+                  Notes supplémentaires
+                </label>
+                <textarea
+                  id="notes"
+                  name="notes"
+                  value={formData.notes}
+                  onChange={handleChange}
+                  rows={3}
+                  className={commonInputClasses}
+                  placeholder="Décoration, équipements spéciaux, etc."
+                />
               </div>
 
               {space && (
@@ -298,60 +366,6 @@ const EventReservationPage: React.FC = () => {
                   </div>
                 </div>
               )}
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Nombre d'invités
-                </label>
-                <input
-                  type="number"
-                  name="nombre_invites"
-                  value={formData.nombre_invites}
-                  onChange={handleChange}
-                  min="1"
-                  max={space?.capacity || 500}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                  required
-                />
-                {space && (
-                  <p className="text-sm text-gray-500 mt-1">
-                    Capacité maximale: {space.capacity} personnes
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Méthode de paiement
-                </label>
-                <select
-                  name="methode_paiement"
-                  value={formData.methode_paiement}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                  required
-                >
-                  {paymentMethods.map(method => (
-                    <option key={method} value={method}>
-                      {method}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Notes supplémentaires
-                </label>
-                <textarea
-                  name="notes"
-                  value={formData.notes}
-                  onChange={handleChange}
-                  rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                  placeholder="Décoration, équipements spéciaux, etc."
-                />
-              </div>
 
               <div className="flex justify-end space-x-4 pt-6">
                 <button
@@ -374,7 +388,7 @@ const EventReservationPage: React.FC = () => {
         </div>
       </div>
       <Footer />
-      
+
       {showPaymentModal && (
         <EventPaymentModal
           isOpen={showPaymentModal}
@@ -387,4 +401,4 @@ const EventReservationPage: React.FC = () => {
   );
 };
 
-export default EventReservationPage;
+export default EventReservationPage;  

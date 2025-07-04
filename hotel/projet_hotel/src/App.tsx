@@ -18,6 +18,7 @@ import EventConfirmationPage from './composant/users/pages/EventConfirmationPage
 import ApartmentConfirmationPage from './composant/users/pages/ApartmentConfirmationPage';
 import ApartmentReservationPage from './composant/users/pages/ApartmentReservationPage';
 import ReservationsDashboard from './composant/users/pages/ReservationsDashboard';
+import ScrollToTop  from './composant/ScrollToTop';
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
+        <ScrollToTop />
         <Routes>
           {/* Route publique - Page de connexion */}
           <Route path="/login" element={<LoginLayout />} />

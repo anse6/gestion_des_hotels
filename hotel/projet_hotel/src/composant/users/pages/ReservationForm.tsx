@@ -25,7 +25,6 @@ type RoomType = {
   room_number?: string;
 };
 
-
 const ReservationPage: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const location = useLocation();
@@ -76,7 +75,7 @@ const ReservationPage: React.FC = () => {
       try {
         const start = new Date(formData.date_arrivee);
         const end = new Date(formData.date_depart);
-        
+
         if (isNaN(start.getTime())) { throw new Error("Date d'arrivée invalide"); }
         if (isNaN(end.getTime())) { throw new Error("Date de départ invalide"); }
         if (end <= start) { throw new Error("La date de départ doit être après l'arrivée"); }
@@ -126,15 +125,16 @@ const ReservationPage: React.FC = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Erreur lors de la réservation');
+        // Here's the change: Access errorData.error for the specific message
+        throw new Error(errorData.error || 'La chambre n\'est pas disponible pour les dates demandées');
       }
 
       const reservationData = await response.json();
       setReservationId(reservationData.id);
-      
-      // Ouvrir le modal de paiement au lieu de rediriger directement
+
+      // Open the payment modal instead of redirecting directly
       setShowPaymentModal(true);
-      
+
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue');
     } finally {
@@ -143,20 +143,23 @@ const ReservationPage: React.FC = () => {
   };
 
   const handlePaymentSuccess = () => {
-    // Rediriger vers la page de confirmation après le paiement
-    navigate('/confirmation', { 
-      state: { 
-        reservation: formData, 
+    // Redirect to the confirmation page after payment
+    navigate('/confirmation', {
+      state: {
+        reservation: formData,
         room,
         reservationId,
         totalPrice
-      } 
+      }
     });
   };
 
   const handlePaymentCancel = () => {
     setShowPaymentModal(false);
   };
+
+  const commonInputClasses = "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 border-blue-400";
+  const dateInputClasses = "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 border-blue-400 appearance-none date-input-style";
 
   return (
     <>
@@ -167,7 +170,7 @@ const ReservationPage: React.FC = () => {
             <h1 className="text-2xl font-bold text-gray-800 mb-6">
               Réservation - {room?.type || 'Chambre #' + roomId}
             </h1>
-            
+
             {error && (
               <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6">
                 <p>{error}</p>
@@ -183,7 +186,7 @@ const ReservationPage: React.FC = () => {
                   name="nom"
                   value={formData.nom}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  className={commonInputClasses}
                   required
                 />
               </div>
@@ -195,7 +198,7 @@ const ReservationPage: React.FC = () => {
                   name="prenom"
                   value={formData.prenom}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  className={commonInputClasses}
                   required
                 />
               </div>
@@ -207,7 +210,7 @@ const ReservationPage: React.FC = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  className={commonInputClasses}
                   required
                 />
               </div>
@@ -219,7 +222,7 @@ const ReservationPage: React.FC = () => {
                   name="date_arrivee"
                   value={formData.date_arrivee}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  className={dateInputClasses}
                   required
                   min={new Date().toISOString().split('T')[0]}
                 />
@@ -232,7 +235,7 @@ const ReservationPage: React.FC = () => {
                   name="date_depart"
                   value={formData.date_depart}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  className={dateInputClasses}
                   required
                   min={formData.date_arrivee || new Date().toISOString().split('T')[0]}
                 />
@@ -247,7 +250,7 @@ const ReservationPage: React.FC = () => {
                   min={1}
                   max={room?.capacity || 10}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  className={commonInputClasses}
                   required
                 />
               </div>
@@ -258,7 +261,7 @@ const ReservationPage: React.FC = () => {
                   name="notes"
                   value={formData.notes}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  className={commonInputClasses}
                   rows={3}
                 />
               </div>
@@ -276,8 +279,8 @@ const ReservationPage: React.FC = () => {
                     <span>Nombre de nuits:</span>
                     <span className="font-semibold">
                       {Math.ceil(
-                        (new Date(formData.date_depart).getTime() - 
-                        new Date(formData.date_arrivee).getTime()) / 
+                        (new Date(formData.date_depart).getTime() -
+                        new Date(formData.date_arrivee).getTime()) /
                         (1000 * 60 * 60 * 24)
                       )}
                     </span>
@@ -312,8 +315,8 @@ const ReservationPage: React.FC = () => {
         </div>
       </div>
       <Footer />
-      
-      {/* Modal de paiement */}
+
+      {/* Payment Modal */}
       {showPaymentModal && (
         <PaymentModal
           isOpen={showPaymentModal}

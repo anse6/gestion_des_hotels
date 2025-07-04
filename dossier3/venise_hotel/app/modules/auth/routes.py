@@ -265,3 +265,76 @@ def count_admins():
     return jsonify({
         "total_admins": admin_count
     })
+
+
+# 🔄 Modifier un utilisateur (par un superadmin)
+@auth_bp.route('/user/<int:id>', methods=['PUT'])
+@jwt_required()
+def update_user(id):
+    current_user = User.query.filter_by(email=get_jwt_identity()).first()
+    if current_user.role != 'superadmin':
+        return jsonify({"error": "Accès refusé"}), 403
+
+    data = request.get_json()
+    user = User.query.get_or_404(id)
+
+    if 'name' in data:
+        user.name = data['name']
+    
+    if 'email' in data:
+        existing_user = User.query.filter_by(email=data['email']).first()
+        if existing_user and existing_user.id != user.id:
+            return jsonify({"error": "Cet email est déjà utilisé"}), 400
+        user.email = data['email']
+    
+    if 'password' in data and data['password']:
+        user.set_password(data['password'])
+
+    db.session.commit()
+    return jsonify({"message": "Utilisateur mis à jour avec succès"}), 200
+
+
+
+# ✅ Supprimer un utilisateur (et ses hôtels s’il est admin)
+@auth_bp.route('/user/<int:id>', methods=['DELETE'])
+@jwt_required()
+def delete_user(id):
+    current_user = User.query.filter_by(email=get_jwt_identity()).first()
+    if current_user.role != 'superadmin':
+        return jsonify({"error": "Accès refusé"}), 403
+
+    user = User.query.get_or_404(id)
+
+    # Supprimer les hôtels associés si l'utilisateur est un admin
+    if user.role == 'admin':
+        from app.modules.hotel.models import Hotel  # ⚠️ Ajuste l'import selon ta structure
+        hotels = Hotel.query.filter_by(admin_id=user.id).all()
+        for hotel in hotels:
+            db.session.delete(hotel)
+
+    db.session.delete(user)
+    db.session.commit()
+
+    return jsonify({"message": "Utilisateur et hôtels associés supprimés avec succès"}), 200
+
+
+
+# ✅ Activer / Désactiver un admin (par superadmin)
+@auth_bp.route('/admin/<int:id>/status', methods=['PUT'])
+@jwt_required()
+def toggle_admin_status(id):
+    current_user = User.query.filter_by(email=get_jwt_identity()).first()
+    if current_user.role != 'superadmin':
+        return jsonify({"error": "Accès refusé"}), 403
+
+    admin = User.query.get_or_404(id)
+    if admin.role != 'admin':
+        return jsonify({"error": "L'utilisateur n'est pas un admin"}), 400
+
+    data = request.get_json()
+    if 'is_active' not in data:
+        return jsonify({"error": "Le champ 'is_active' est requis"}), 400
+
+    admin.is_active = data['is_active']
+    db.session.commit()
+    return jsonify({"message": f"Admin {'activé' if data['is_active'] else 'désactivé'} avec succès"}), 200

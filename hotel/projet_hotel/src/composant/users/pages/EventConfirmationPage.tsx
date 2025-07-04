@@ -24,7 +24,7 @@ const EventConfirmationPage: React.FC = () => {
               Aucune réservation trouvée
             </h1>
             <button
-              onClick={() => navigate('/event-rooms')}
+              onClick={() => navigate('/users')}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               Retour aux salles

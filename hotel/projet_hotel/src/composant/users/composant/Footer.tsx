@@ -19,10 +19,10 @@ const Footer: React.FC = () => {
               mémorables alliant confort moderne et hospitalité africaine authentique.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full transition duration-300">
+              <a href="https://wa.me/237695683485" className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full transition duration-300">
                 <FaWhatsapp className="text-xl" />
               </a>
-              <a href="#" className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full transition duration-300">
+              <a href="https://www.facebook.com/share" className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full transition duration-300">
                 <FaFacebook className="text-xl" />
               </a>
               <a href="#" className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full transition duration-300">
@@ -92,12 +92,12 @@ const Footer: React.FC = () => {
                   <FaPhone />
                 </span>
                 <div>
-                  <a href="tel:+237699999999" className="text-gray-400 hover:text-white transition duration-300">
-                    +237 6 99 99 99 99
+                  <a href="orange" className="text-gray-400 hover:text-white transition duration-300">
+                    +237 695 683 485
                   </a>
                   <br />
-                  <a href="tel:+237222222222" className="text-gray-400 hover:text-white transition duration-300">
-                    +237 2 22 22 22 22
+                  <a href="mtn" className="text-gray-400 hover:text-white transition duration-300">
+                    +237 652 021 435
                   </a>
                 </div>
               </li>
@@ -107,11 +107,11 @@ const Footer: React.FC = () => {
                 </span>
                 <div>
                   <a href="mailto:contact@hotelscameroun.cm" className="text-gray-400 hover:text-white transition duration-300">
-                    contact@hotelscameroun.cm
+                    ansevernel@gmail.com
                   </a>
                   <br />
                   <a href="mailto:reservation@hotelscameroun.cm" className="text-gray-400 hover:text-white transition duration-300">
-                    reservation@hotelscameroun.cm
+                    Anseehoʊ.t̬əl@hotelscameroun.cm
                   </a>
                 </div>
               </li>

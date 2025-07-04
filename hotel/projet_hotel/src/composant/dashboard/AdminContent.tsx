@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { Plus, Trash2, Edit, X } from 'lucide-react';
+import { Plus, Trash2, Edit, X, Power, PowerOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Admin {
@@ -22,10 +22,28 @@ const createAdmin = async (admin: { name: string; email: string; password: strin
   return res.data;
 };
 
+const updateAdmin = async ({ id, ...admin }: { id: number; name: string; email: string; password?: string }) => {
+  const res = await axios.put(`http://localhost:5000/api/auth/user/${id}`, admin);
+  return res.data;
+};
+
+const toggleAdminStatus = async ({ id, is_active }: { id: number; is_active: boolean }) => {
+  const res = await axios.put(`http://localhost:5000/api/auth/admin/${id}/status`, { is_active });
+  return res.data;
+};
+
+const deleteAdmin = async (id: number) => {
+  const res = await axios.delete(`http://localhost:5000/api/auth/user/${id}`);
+  return res.data;
+};
+
 const AdminContent: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingAdmin, setEditingAdmin] = useState<Admin | null>(null);
   const [formData, setFormData] = useState({ name: '', email: '', password: 'admin123' });
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   const { data: admins = [], isLoading, isError } = useQuery({
@@ -33,15 +51,57 @@ const AdminContent: React.FC = () => {
     queryFn: fetchAdmins
   });
 
-  const { mutate, isPending: isCreating } = useMutation({
+  const { mutate: createMutate, isPending: isCreating } = useMutation({
     mutationFn: createAdmin,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admins'] });
       setIsModalOpen(false);
       setFormData({ name: '', email: '', password: 'admin123' });
+      setSuccess("Administrateur créé avec succès");
+      setTimeout(() => setSuccess(null), 3000);
     },
     onError: () => {
       setError("Erreur lors de la création de l'admin");
+    }
+  });
+
+  const { mutate: updateMutate, isPending: isUpdating } = useMutation({
+    mutationFn: updateAdmin,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admins'] });
+      setIsModalOpen(false);
+      setIsEditMode(false);
+      setEditingAdmin(null);
+      setFormData({ name: '', email: '', password: 'admin123' });
+      setSuccess("Administrateur modifié avec succès");
+      setTimeout(() => setSuccess(null), 3000);
+    },
+    onError: () => {
+      setError("Erreur lors de la modification de l'admin");
+    }
+  });
+
+  const { mutate: toggleStatusMutate } = useMutation({
+    mutationFn: toggleAdminStatus,
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['admins'] });
+      setSuccess(`Admin ${variables.is_active ? 'activé' : 'désactivé'} avec succès`);
+      setTimeout(() => setSuccess(null), 3000);
+    },
+    onError: () => {
+      setError("Erreur lors du changement de statut");
+    }
+  });
+
+  const { mutate: deleteMutate } = useMutation({
+    mutationFn: deleteAdmin,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admins'] });
+      setSuccess("Administrateur supprimé avec succès");
+      setTimeout(() => setSuccess(null), 3000);
+    },
+    onError: () => {
+      setError("Erreur lors de la suppression de l'admin");
     }
   });
 
@@ -54,12 +114,50 @@ const AdminContent: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.email || !formData.password) {
+    if (!formData.name || !formData.email || (!isEditMode && !formData.password)) {
       setError("Tous les champs sont obligatoires");
       return;
     }
 
-    mutate(formData);
+    if (isEditMode && editingAdmin) {
+      const updateData = {
+        id: editingAdmin.id,
+        name: formData.name,
+        email: formData.email,
+        ...(formData.password && formData.password !== 'admin123' && { password: formData.password })
+      };
+      updateMutate(updateData);
+    } else {
+      createMutate(formData);
+    }
+  };
+
+  const handleEdit = (admin: Admin) => {
+    setEditingAdmin(admin);
+    setFormData({
+      name: admin.name,
+      email: admin.email,
+      password: ''
+    });
+    setIsEditMode(true);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = (id: number) => {
+    deleteMutate(id);
+  };
+
+  const handleToggleStatus = (admin: Admin) => {
+    const newStatus = !admin.is_active;
+    toggleStatusMutate({ id: admin.id, is_active: newStatus });
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setIsEditMode(false);
+    setEditingAdmin(null);
+    setFormData({ name: '', email: '', password: 'admin123' });
+    setError(null);
   };
 
   return (
@@ -73,6 +171,17 @@ const AdminContent: React.FC = () => {
             className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded mb-6 shadow-sm"
           >
             {error}
+          </motion.div>
+        )}
+        
+        {success && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded mb-6 shadow-sm"
+          >
+            {success}
           </motion.div>
         )}
       </AnimatePresence>
@@ -150,12 +259,29 @@ const AdminContent: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <div className="flex space-x-3">
-                        <button className="text-blue-600 hover:text-blue-900 transition-colors">
-                          <Edit size={18} />
+                      <div className="flex space-x-2">
+                        <button 
+                          onClick={() => handleEdit(admin)}
+                          className="text-blue-600 hover:text-blue-900 transition-colors p-1 rounded hover:bg-blue-50"
+                          title="Modifier"
+                        >
+                          <Edit size={16} />
                         </button>
-                        <button className="text-red-600 hover:text-red-900 transition-colors">
-                          <Trash2 size={18} />
+                        <button 
+                          onClick={() => handleToggleStatus(admin)}
+                          className={`${
+                            admin.is_active ? 'text-orange-600 hover:text-orange-900' : 'text-green-600 hover:text-green-900'
+                          } transition-colors p-1 rounded hover:bg-gray-50`}
+                          title={admin.is_active ? 'Désactiver' : 'Activer'}
+                        >
+                          {admin.is_active ? <PowerOff size={16} /> : <Power size={16} />}
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(admin.id)}
+                          className="text-red-600 hover:text-red-900 transition-colors p-1 rounded hover:bg-red-50"
+                          title="Supprimer"
+                        >
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </td>
@@ -174,7 +300,7 @@ const AdminContent: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50 p-4"
           >
             <motion.div
               initial={{ scale: 0.9, y: 20 }}
@@ -184,9 +310,11 @@ const AdminContent: React.FC = () => {
             >
               <div className="bg-gradient-to-r from-blue-600 to-blue-500 p-4 text-white">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-semibold">Nouvel Administrateur</h2>
+                  <h2 className="text-xl font-semibold">
+                    {isEditMode ? 'Modifier Administrateur' : 'Nouvel Administrateur'}
+                  </h2>
                   <button 
-                    onClick={() => setIsModalOpen(false)} 
+                    onClick={handleCloseModal} 
                     className="text-white hover:text-gray-200 transition-colors"
                   >
                     <X size={20} />
@@ -219,21 +347,23 @@ const AdminContent: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Mot de passe {isEditMode ? '(laisser vide pour ne pas changer)' : '*'}
+                  </label>
                   <input
                     name="password"
                     type="password"
                     value={formData.password}
                     onChange={handleInputChange}
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                    required
+                    required={!isEditMode}
                   />
                 </div>
 
                 <div className="flex justify-end gap-3 pt-2">
                   <motion.button
                     type="button"
-                    onClick={() => setIsModalOpen(false)}
+                    onClick={handleCloseModal}
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.98 }}
                     className="px-5 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
@@ -244,10 +374,13 @@ const AdminContent: React.FC = () => {
                     type="submit"
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.98 }}
-                    disabled={isCreating}
-                    className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    disabled={isCreating || isUpdating}
+                    className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
                   >
-                    {isCreating ? 'Ajout...' : 'Créer'}
+                    {isCreating || isUpdating ? 
+                      (isEditMode ? 'Modification...' : 'Ajout...') : 
+                      (isEditMode ? 'Modifier' : 'Créer')
+                    }
                   </motion.button>
                 </div>
               </form>
