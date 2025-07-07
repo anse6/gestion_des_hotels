@@ -7,6 +7,7 @@ import PartyHalls from "./composant/PartyHalls";
 import Apartments from "./composant/Apartments";
 import Settings from "./composant/Settings";
 import ReservationsList from "./composant/Listereservation";
+import Personnel from "./composant/Personnel";
 
 
 const HotelPage: React.FC = () => {
@@ -28,6 +29,8 @@ const HotelPage: React.FC = () => {
         return <Apartments />;
       case "settings":
         return <Settings />;
+        case "personnel":
+        return < Personnel/>
       default:
         return <Dashboard />;
     }

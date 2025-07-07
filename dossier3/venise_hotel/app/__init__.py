@@ -28,6 +28,9 @@ def create_app():
 
     from app.modules.reservation.routes import reservation_bp
     app.register_blueprint(reservation_bp)
+    
+    from app.modules.personnel.routes import personnel_bp
+    app.register_blueprint(personnel_bp)
 
     @app.route('/')
     def index():

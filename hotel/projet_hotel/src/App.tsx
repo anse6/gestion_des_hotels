@@ -19,6 +19,8 @@ import ApartmentConfirmationPage from './composant/users/pages/ApartmentConfirma
 import ApartmentReservationPage from './composant/users/pages/ApartmentReservationPage';
 import ReservationsDashboard from './composant/users/pages/ReservationsDashboard';
 import ScrollToTop  from './composant/ScrollToTop';
+import Scanner from './composant/hotel/composant/Scanner';
+import ExemplePage from './composant/hotel/composant/Qrpep';
 
 const queryClient = new QueryClient();
 
@@ -33,6 +35,10 @@ const App: React.FC = () => {
           
           {/* Page publique principale */}
           <Route path="/users" element={<Userpep />} />
+
+          <Route path="/scannerqr" element={<ExemplePage />} /> 
+
+          <Route path="/scanner" element={<Scanner />} /> // 
           
           {/* Redirection par défaut vers la page publique principale */}
           <Route path="/" element={<Navigate to="/users" replace />} />
@@ -53,6 +59,8 @@ const App: React.FC = () => {
             <Route path="/confirmation-evenement" element={<EventConfirmationPage />} />
             <Route path="/reservation-appartement/:apartmentId" element={<ApartmentReservationPage />} />
             <Route path="/confirmation-appartement" element={<ApartmentConfirmationPage />} />
+      
+            
 
           </Route>
         </Routes>

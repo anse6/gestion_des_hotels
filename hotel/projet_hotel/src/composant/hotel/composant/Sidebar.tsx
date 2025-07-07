@@ -13,6 +13,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
     { id: "rooms", label: "Rooms", icon: "fa-bed" },
     { id: "partyHalls", label: "Party Halls", icon: "fa-glass-cheers" },
     { id: "apartments", label: "Apartments", icon: "fa-building" },
+    { id: "personnel", label: "Personnels", icon: "fa-cog" },
     { id: "settings", label: "Settings", icon: "fa-cog" },
   ];
 

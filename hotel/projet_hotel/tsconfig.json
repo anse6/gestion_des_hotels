@@ -1,4 +1,7 @@
 {
+  "compilerOptions": {
+    "types": ["qr-scanner"]
+  },
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },
