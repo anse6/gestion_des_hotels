@@ -8,7 +8,7 @@ import OccupancyChart from "./composantdashboard/OccupancyChart";
 import QuickStats from "./composantdashboard/QuickStats";
 import BookingsDashboard from './composantdashboard/BookingsDashboard';
 //import RecentBookingsTable from "./RecentBookingsTable";
-import DashboardHeader from "./composantdashboard/DashboardHeader";
+//import DashboardHeader from "./composantdashboard/DashboardHeader";
 //import { recentBookings } from "./mockData";
 
 // Enregistrer les composants nécessaires de Chart.js
@@ -27,22 +27,22 @@ ChartJS.register(
 const Dashboard: React.FC = () => {
   return (
     <div className="p-6">
-      <DashboardHeader 
+      {/* <DashboardHeader 
         title="Tableau de bord" 
         description="Bienvenue sur le tableau de bord de gestion de votre hôtel" 
-      />
+      /> */}
       
       <Dashboard1 />
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <RevenueDistributionChart />
-        <OccupancyChart />
-      </div>
+      <div className="max-w-screen-xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 px-4">
+      <RevenueDistributionChart />
+      <OccupancyChart /> 
+    </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <RevenueDistributionChart />
-        <QuickStats />
-      </div>
+
+      <div className="w-6x1 max-w-screen-2xl mx-auto">
+      <QuickStats />
+    </div>
 
       <BookingsDashboard  />
     </div>

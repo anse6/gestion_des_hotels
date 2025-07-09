@@ -165,44 +165,33 @@ def get_room_reservation(reservation_id, user_id=None):
         current_app.logger.error(f"Erreur lors de la récupération de la réservation: {str(e)}")
         return None, str(e)
 
-def search_room_reservations(params=None, user_id=None):
-    """
-    Recherche des réservations de chambre avec différents filtres
-    """
-    try:
-        query = RoomReservation.query
-        
-        # Filtrer par utilisateur si spécifié
-        if user_id:
-            query = query.filter(RoomReservation.user_id == user_id)
-        
-        # Ajouter d'autres filtres si fournis
-        if params:
-            if 'hotel_id' in params and params['hotel_id']:
-                query = query.join(Room).filter(Room.hotel_id == params['hotel_id'])
-            
-            if 'room_id' in params and params['room_id']:
-                query = query.filter(RoomReservation.room_id == params['room_id'])
-            
-            if 'status' in params and params['status']:
-                query = query.filter(RoomReservation.statut == params['status'])
-            
-            if 'email' in params and params['email']:
-                query = query.filter(RoomReservation.email == params['email'])
-            
-            if 'from_date' in params and params['from_date']:
-                query = query.filter(RoomReservation.date_arrivee >= params['from_date'])
-            
-            if 'to_date' in params and params['to_date']:
-                query = query.filter(RoomReservation.date_depart <= params['to_date'])
-        
-        # Ordonner par date de création (plus récent d'abord)
-        query = query.order_by(RoomReservation.created_at.desc())
-        
-        return query.all(), None
-    except Exception as e:
-        current_app.logger.error(f"Erreur lors de la recherche de réservations: {str(e)}")
-        return None, str(e)
+def search_room_reservations(filters, user_id=None, admin_hotel_ids=None):
+    query = RoomReservation.query.join(Room)
+
+    if user_id:
+        query = query.filter(RoomReservation.user_id == user_id)
+
+    if filters.get('room_id'):
+        query = query.filter(RoomReservation.room_id == filters['room_id'])
+
+    if filters.get('status'):
+        query = query.filter(RoomReservation.statut == filters['status'])
+
+    if filters.get('email'):
+        query = query.filter(RoomReservation.email.ilike(f"%{filters['email']}%"))
+
+    if filters.get('from_date'):
+        query = query.filter(RoomReservation.date_arrivee >= filters['from_date'])
+
+    if filters.get('to_date'):
+        query = query.filter(RoomReservation.date_depart <= filters['to_date'])
+
+    # 🟨 Ici on filtre uniquement les chambres des hôtels que l'admin possède
+    if admin_hotel_ids:
+        query = query.filter(Room.hotel_id.in_(admin_hotel_ids))
+
+    reservations = query.order_by(RoomReservation.date_arrivee.desc()).all()
+    return reservations, None
 
 # Services pour les réservations d'appartements
 def create_apartment_reservation(apartment_id, reservation_data, user_id=None):
@@ -358,44 +347,34 @@ def get_apartment_reservation(reservation_id, user_id=None):
         current_app.logger.error(f"Erreur lors de la récupération de la réservation: {str(e)}")
         return None, str(e)
 
-def search_apartment_reservations(params=None, user_id=None):
-    """
-    Recherche des réservations d'appartement avec différents filtres
-    """
-    try:
-        query = ApartmentReservation.query
-        
-        # Filtrer par utilisateur si spécifié
-        if user_id:
-            query = query.filter(ApartmentReservation.user_id == user_id)
-        
-        # Ajouter d'autres filtres si fournis
-        if params:
-            if 'hotel_id' in params and params['hotel_id']:
-                query = query.join(Apartment).filter(Apartment.hotel_id == params['hotel_id'])
-            
-            if 'apartment_id' in params and params['apartment_id']:
-                query = query.filter(ApartmentReservation.apartment_id == params['apartment_id'])
-            
-            if 'status' in params and params['status']:
-                query = query.filter(ApartmentReservation.statut == params['status'])
-            
-            if 'email' in params and params['email']:
-                query = query.filter(ApartmentReservation.email == params['email'])
-            
-            if 'from_date' in params and params['from_date']:
-                query = query.filter(ApartmentReservation.date_arrivee >= params['from_date'])
-            
-            if 'to_date' in params and params['to_date']:
-                query = query.filter(ApartmentReservation.date_depart <= params['to_date'])
-        
-        # Ordonner par date de création (plus récent d'abord)
-        query = query.order_by(ApartmentReservation.created_at.desc())
-        
-        return query.all(), None
-    except Exception as e:
-        current_app.logger.error(f"Erreur lors de la recherche de réservations: {str(e)}")
-        return None, str(e)
+def search_apartment_reservations(filters, user_id=None, admin_hotel_ids=None):
+    query = ApartmentReservation.query.join(Apartment)
+
+    if user_id:
+        query = query.filter(ApartmentReservation.user_id == user_id)
+
+    if filters.get('apartment_id'):
+        query = query.filter(ApartmentReservation.apartment_id == filters['apartment_id'])
+
+    if filters.get('status'):
+        query = query.filter(ApartmentReservation.statut == filters['status'])
+
+    if filters.get('email'):
+        query = query.filter(ApartmentReservation.email.ilike(f"%{filters['email']}%"))
+
+    if filters.get('from_date'):
+        query = query.filter(ApartmentReservation.date_arrivee >= filters['from_date'])
+
+    if filters.get('to_date'):
+        query = query.filter(ApartmentReservation.date_depart <= filters['to_date'])
+
+    # 🟨 Filtrage des appartements appartenant aux hôtels de l'admin
+    if admin_hotel_ids:
+        query = query.filter(Apartment.hotel_id.in_(admin_hotel_ids))
+
+    reservations = query.order_by(ApartmentReservation.date_arrivee.desc()).all()
+    return reservations, None
+
 
 # Services pour les réservations de salles d'événements
 def create_event_room_reservation(event_room_id, reservation_data, user_id=None):
@@ -568,48 +547,34 @@ def get_event_room_reservation(reservation_id, user_id=None):
         current_app.logger.error(f"Erreur lors de la récupération de la réservation: {str(e)}")
         return None, str(e)
 
-def search_event_room_reservations(params=None, user_id=None):
-    """
-    Recherche des réservations de salles d'événement avec différents filtres
-    """
-    try:
-        query = EventRoomReservation.query
-        
-        # Filtrer par utilisateur si spécifié
-        if user_id:
-            query = query.filter(EventRoomReservation.user_id == user_id)
-        
-        # Ajouter d'autres filtres si fournis
-        if params:
-            if 'hotel_id' in params and params['hotel_id']:
-                query = query.join(EventRoom).filter(EventRoom.hotel_id == params['hotel_id'])
-            
-            if 'event_room_id' in params and params['event_room_id']:
-                query = query.filter(EventRoomReservation.event_room_id == params['event_room_id'])
-            
-            if 'status' in params and params['status']:
-                query = query.filter(EventRoomReservation.statut == params['status'])
-            
-            if 'email' in params and params['email']:
-                query = query.filter(EventRoomReservation.email == params['email'])
-            
-            if 'from_date' in params and params['from_date']:
-                query = query.filter(EventRoomReservation.date_evenement >= params['from_date'])
-            
-            if 'to_date' in params and params['to_date']:
-                query = query.filter(EventRoomReservation.date_evenement <= params['to_date'])
-            
-            if 'event_type' in params and params['event_type']:
-                query = query.filter(EventRoomReservation.type_evenement == params['event_type'])
-        
-        # Ordonner par date de création (plus récent d'abord)
-        query = query.order_by(EventRoomReservation.created_at.desc())
-        
-        return query.all(), None
-    except Exception as e:
-        current_app.logger.error(f"Erreur lors de la recherche de réservations: {str(e)}")
-        return None, str(e)
-    
+def search_event_room_reservations(filters, user_id=None, admin_hotel_ids=None):
+    query = EventRoomReservation.query.join(EventRoom)
+
+    if user_id:
+        query = query.filter(EventRoomReservation.user_id == user_id)
+
+    if filters.get('event_room_id'):
+        query = query.filter(EventRoomReservation.event_room_id == filters['event_room_id'])
+
+    if filters.get('status'):
+        query = query.filter(EventRoomReservation.statut == filters['status'])
+
+    if filters.get('email'):
+        query = query.filter(EventRoomReservation.email.ilike(f"%{filters['email']}%"))
+
+    if filters.get('from_date'):
+        query = query.filter(EventRoomReservation.date_evenement >= filters['from_date'])
+
+    if filters.get('to_date'):
+        query = query.filter(EventRoomReservation.date_evenement <= filters['to_date'])
+
+    # 🔐 Filtrer uniquement les hôtels de l’admin
+    if admin_hotel_ids:
+        query = query.filter(EventRoom.hotel_id.in_(admin_hotel_ids))
+
+    reservations = query.order_by(EventRoomReservation.date_evenement.desc()).all()
+    return reservations, None
+
     
     
 # Dans email_service.py

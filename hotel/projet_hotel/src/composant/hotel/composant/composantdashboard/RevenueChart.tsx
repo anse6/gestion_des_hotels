@@ -6,7 +6,7 @@ const RevenueChart: React.FC = () => {
     labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov", "Déc"],
     datasets: [
       {
-        label: "Revenus (€)",
+        label: "Revenus (F)",
         data: [12000, 19000, 15000, 18000, 22000, 25000, 28000, 26000, 24000, 21000, 23000, 30000],
         borderColor: "rgba(59, 130, 246, 1)",
         backgroundColor: "rgba(59, 130, 246, 0.1)",
@@ -32,7 +32,7 @@ const RevenueChart: React.FC = () => {
         beginAtZero: true,
         title: {
           display: true,
-          text: "Montant (€)",
+          text: "Montant (F)",
         },
       },
     },

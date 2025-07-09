@@ -21,6 +21,9 @@ import ReservationsDashboard from './composant/users/pages/ReservationsDashboard
 import ScrollToTop  from './composant/ScrollToTop';
 import Scanner from './composant/hotel/composant/Scanner';
 import ExemplePage from './composant/hotel/composant/Qrpep';
+import LoginLayoutrest from './composant/authentification/LoginLayoutrest';
+import LoginLayoutrestcover from './composant/authentification/LoginLayoutrestcover';
+import LoginLayoutresst from './composant/authentification/LoginLayoutresst';
 
 const queryClient = new QueryClient();
 
@@ -32,13 +35,20 @@ const App: React.FC = () => {
         <Routes>
           {/* Route publique - Page de connexion */}
           <Route path="/login" element={<LoginLayout />} />
+
+           <Route path="/register" element={<LoginLayoutrestcover />} />
+
+          <Route path="/forgotpassword" element={<LoginLayoutrest />} />//LoginLayoutresst
+
+          <Route path="/resst-password" element={<LoginLayoutresst />} />
+
           
           {/* Page publique principale */}
           <Route path="/users" element={<Userpep />} />
 
           <Route path="/scannerqr" element={<ExemplePage />} /> 
 
-          <Route path="/scanner" element={<Scanner />} /> // 
+          <Route path="/scanner" element={<Scanner />} /> /
           
           {/* Redirection par défaut vers la page publique principale */}
           <Route path="/" element={<Navigate to="/users" replace />} />

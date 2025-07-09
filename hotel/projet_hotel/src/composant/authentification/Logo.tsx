@@ -24,7 +24,12 @@ const Logo = () => {
           </svg>
         </div>
       </div>
-      <p className="text-xs md:text-sm font-bold mt-2 text-center text-purple-800">VENIDE ANSEDEV</p>
+       <span className="hidden sm:inline text-white">
+                 Anseehoʊ.t̬əl<span className="text-blue-500">T</span> {/* Signature avec le T stylisé */}
+              </span>
+              <span className="sm:hidden">
+                A<span className="text-blue-500">T</span> {/* Version abrégée */}
+              </span>
     </div>
   );
 };

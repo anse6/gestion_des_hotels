@@ -222,7 +222,7 @@ const EventConfirmationPage: React.FC = () => {
               </PDFDownloadLink>
               
               <button
-                onClick={() => navigate('/event-rooms')}
+                onClick={() => navigate('/users')}
                 className="flex items-center justify-center px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

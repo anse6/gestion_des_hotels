@@ -10,21 +10,15 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
     { id: "dashboard", label: "Dashboard", icon: "fa-tachometer-alt" },
     { id: "reservations", label: "Reservations", icon: "fa-calendar-alt" },
     { id: "list", label: "Liste des reservation", icon: "fa-building" },
-    { id: "rooms", label: "Rooms", icon: "fa-bed" },
-    { id: "partyHalls", label: "Party Halls", icon: "fa-glass-cheers" },
-    { id: "apartments", label: "Apartments", icon: "fa-building" },
-    { id: "personnel", label: "Personnels", icon: "fa-cog" },
-    { id: "settings", label: "Settings", icon: "fa-cog" },
+    { id: "rooms", label: "Chambre", icon: "fa-bed" },
+    { id: "partyHalls", label: "Salle de fete", icon: "fa-glass-cheers" },
+    { id: "apartments", label: "Appartments", icon: "fa-building" },
+    { id: "personnel", label: "Personnels", icon: "fa-user" },
+    { id: "settings", label: "Parametre", icon: "fa-cog" },
   ];
 
   return (
     <aside className="bg-white shadow-sm fixed left-0 top-16 bottom-0 w-64 overflow-y-auto transition-all duration-300 ease-in-out z-20">
-      <div className="p-4 border-b border-gray-100">
-        <div className="flex items-center justify-center">
-          <i className="fas fa-hotel text-blue-600 text-2xl mr-2"></i>
-          <h1 className="text-xl font-bold text-gray-800">Hotel Admin</h1>
-        </div>
-      </div>
       <nav className="mt-4">
         <ul>
           {menuItems.map((item) => (

@@ -1,13 +1,14 @@
 import React from 'react';
 import Slider from 'react-slick';
-import LoginForm from "./LoginForm";
+//import LoginForm from "./LoginForm";
 import image from "../../assets/venise.png";
 import Logo from "./Logo";
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import ResetPasswordForm from './ResetPasswordForm';
 
-const LoginLayout: React.FC = () => {
+const LoginLayoutresst: React.FC = () => {
   // Configuration du carrousel
   const sliderSettings = {
     dots: true,
@@ -32,7 +33,7 @@ const LoginLayout: React.FC = () => {
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Section formulaire - toujours visible */}
       <div className="w-full md:w-1/2 flex items-center justify-center py-8 md:py-0 px-4 sm:px-6">
-        <LoginForm />
+        <ResetPasswordForm verificationToken={''} />
       </div>
       
       {/* Section illustration avec carrousel - cachée sur mobile */}
@@ -43,8 +44,8 @@ const LoginLayout: React.FC = () => {
         
         <div className="text-center max-w-md mb-8 z-10">
          <p className="text-lg font-medium text-white">
-          Gérez facilement vos chambres, réservations,<br />
-          clients et paiements depuis une seule plateforme.
+        Gérez facilement vos chambres, réservations,<br />
+        clients et paiements depuis une seule plateforme.
         </p>
 
         </div>
@@ -68,4 +69,4 @@ const LoginLayout: React.FC = () => {
   );
 };
 
-export default LoginLayout;
+export default LoginLayoutresst;

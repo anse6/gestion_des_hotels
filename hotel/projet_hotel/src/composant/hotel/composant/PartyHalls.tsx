@@ -224,7 +224,7 @@ const PartyHalls: React.FC = () => {
                   </p>
                 </div>
                 <div className="bg-purple-50 text-purple-700 px-2 py-1 rounded-md text-sm font-medium">
-                  {hall.rental_price.toFixed(2)} €/jour
+                  {hall.rental_price.toFixed(2)} fca/jour
                 </div>
               </div>
               <p className="mt-2 text-gray-600 text-sm line-clamp-2">

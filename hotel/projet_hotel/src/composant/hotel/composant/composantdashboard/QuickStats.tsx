@@ -67,7 +67,7 @@ const QuickStats: React.FC = () => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100 lg:col-span-2">
+    <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100 w-full">
       <h3 className="font-semibold text-lg text-gray-800 mb-4">Statistiques rapides</h3>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <div className="bg-blue-50 p-4 rounded-lg">

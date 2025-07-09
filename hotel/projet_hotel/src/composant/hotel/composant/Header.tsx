@@ -30,13 +30,23 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 lg:px-6 relative">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 lg:px-6">
+
       <div className="flex items-center lg:hidden">
         <button onClick={toggleSidebar} className="p-2 rounded-lg text-gray-600 hover:bg-gray-100">
           <Menu size={22} />
         </button>
       </div>
-      <div className="flex-1 max-w-xl ml-4">
+
+       <div className="flex items-center justify-center">
+        <span className="hidden sm:inline text-3xl font-bold">
+          Anseehoʊ.t̬əl<span className="text-blue-500">T</span> {/* Signature avec le T stylisé */}
+        </span>
+        <span className="sm:hidden text-2xl font-bold">
+          A<span className="text-blue-500">T</span> {/* Version abrégée */}
+        </span>
+      </div>
+      <div className="flex-1 max-w-xl -ml-60">
         <div className="relative">
           <input 
             type="text" 

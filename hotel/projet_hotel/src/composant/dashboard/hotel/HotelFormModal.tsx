@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import type { HotelFormProps } from './types';
 
 const countries = [
-  "France", "Belgique", "Suisse", "Canada", "États-Unis",
+  "Cameroun", "cote d'ivoire", "benin", "senegal", "Gabon",
   "Royaume-Uni", "Allemagne", "Espagne", "Italie", "Portugal",
  
 ];

@@ -217,7 +217,7 @@ const Rooms: React.FC = () => {
                   </p>
                 </div>
                 <div className="bg-blue-50 text-blue-700 px-2 py-1 rounded-md text-sm font-medium">
-                  {room.price_per_night.toFixed(2)} €/nuit
+                  {room.price_per_night.toFixed(2)} fca/nuit
                 </div>
               </div>
               {room.description && (

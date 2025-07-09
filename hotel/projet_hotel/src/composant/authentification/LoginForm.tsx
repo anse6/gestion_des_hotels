@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useAuth } from './hooks/useAuth';
 import type { LoginCredentials } from './types/auth';
+import { Link } from 'react-router-dom';
 
 const LoginForm: React.FC = () => {
   const [credentials, setCredentials] = useState<LoginCredentials>({
@@ -63,6 +64,24 @@ const LoginForm: React.FC = () => {
             required
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
           />
+        </div>
+
+         <div className="text-center mt-6">
+        <Link
+            to="/forgotpassword"
+            className="text-indigo-600 hover:text-indigo-800 font-medium transition duration-200 -ml-75"
+        >
+             mot de passe oublié ?
+        </Link>
+        </div>
+         <div className="text-center mt-6">
+        <Link
+        to="/register"
+        className="text-indigo-600 hover:text-indigo-800 font-medium transition duration-200 -ml-78"
+      >
+        Créez votre compte
+      </Link>
+
         </div>
 
         <div>

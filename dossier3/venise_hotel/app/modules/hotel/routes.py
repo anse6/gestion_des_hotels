@@ -525,3 +525,163 @@ def count_hotels():
         "objectif": objectif,
         "progression": f"{pourcentage}%"
     })
+    
+    
+    
+    
+    
+    
+# Ajoutez cette route dans votre fichier routes.py (hotel_bp)
+
+@hotel_bp.route('/revenue-stats', methods=['GET'])
+@jwt_required()
+def get_revenue_stats():
+    """
+    Renvoie les statistiques de revenus par hôtel avec objectifs et progression
+    """
+    try:
+        current_user = get_current_user()
+        if not current_user:
+            return jsonify({"error": "Authentification requise"}), 401
+        
+        # Récupération des hôtels selon le rôle
+        if current_user.role == 'superadmin':
+            hotels = Hotel.query.all()
+        else:
+            hotels = current_user.managed_hotels
+        
+        revenue_data = []
+        
+        for hotel in hotels:
+            # Calcul du revenu actuel (exemple avec des données simulées)
+            # Vous devrez adapter selon votre logique métier réelle
+            
+            # Simulation du calcul de revenus
+            # Dans un cas réel, vous calculeriez depuis les réservations
+            total_rooms = len(hotel.rooms)
+            total_apartments = len(hotel.apartments) if hasattr(hotel, 'apartments') else 0
+            total_event_rooms = len(hotel.event_rooms) if hasattr(hotel, 'event_rooms') else 0
+            
+            # Calcul simulé du revenu (à adapter selon votre logique)
+            base_revenue = (total_rooms * 50000) + (total_apartments * 80000) + (total_event_rooms * 30000)
+            
+            # Objectif basé sur la capacité de l'hôtel
+            target_revenue = base_revenue * 1.2  # 20% de plus que la base
+            
+            # Calcul du pourcentage de progression
+            percentage = round((base_revenue / target_revenue) * 100) if target_revenue > 0 else 0
+            
+            revenue_data.append({
+                "hotel_id": hotel.id,
+                "hotel_name": hotel.name,
+                "current_revenue": base_revenue,
+                "target_revenue": target_revenue,
+                "percentage": percentage,
+                "city": hotel.city,
+                "country": hotel.country
+            })
+        
+        return jsonify({
+            "success": True,
+            "data": revenue_data,
+            "total_hotels": len(revenue_data),
+            "total_current_revenue": sum(item["current_revenue"] for item in revenue_data),
+            "total_target_revenue": sum(item["target_revenue"] for item in revenue_data)
+        })
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# Alternative avec des données plus réalistes (si vous avez une table de réservations)
+@hotel_bp.route('/revenue-stats-detailed', methods=['GET'])
+@jwt_required()
+def get_detailed_revenue_stats():
+    """
+    Version plus détaillée avec calcul de revenus réels
+    (nécessite une table de réservations/bookings)
+    """
+    try:
+        current_user = get_current_user()
+        if not current_user:
+            return jsonify({"error": "Authentification requise"}), 401
+        
+        # Récupération des hôtels selon le rôle
+        if current_user.role == 'superadmin':
+            hotels = Hotel.query.all()
+        else:
+            hotels = current_user.managed_hotels
+        
+        revenue_data = []
+        
+        for hotel in hotels:
+            # Calcul du revenu des chambres
+            room_revenue = 0
+            for room in hotel.rooms:
+                # Ici vous calculeriez le revenu réel depuis les réservations
+                # Exemple : room_revenue += sum(booking.total_amount for booking in room.bookings)
+                room_revenue += room.price_per_night * 20  # Simulation : 20 nuits vendues
+            
+            # Calcul du revenu des appartements
+            apartment_revenue = 0
+            if hasattr(hotel, 'apartments'):
+                for apartment in hotel.apartments:
+                    apartment_revenue += apartment.price_per_night * 15  # Simulation
+            
+            # Calcul du revenu des salles de fête
+            event_revenue = 0
+            if hasattr(hotel, 'event_rooms'):
+                for event_room in hotel.event_rooms:
+                    event_revenue += event_room.rental_price * 5  # Simulation : 5 événements
+            
+            total_revenue = room_revenue + apartment_revenue + event_revenue
+            
+            # Objectif basé sur la capacité théorique
+            theoretical_capacity = (len(hotel.rooms) * 80000) + (len(hotel.apartments) * 120000) + (len(hotel.event_rooms) * 50000)
+            target_revenue = theoretical_capacity * 0.8  # 80% de la capacité théorique
+            
+            percentage = round((total_revenue / target_revenue) * 100) if target_revenue > 0 else 0
+            
+            revenue_data.append({
+                "hotel_id": hotel.id,
+                "hotel_name": hotel.name,
+                "current_revenue": total_revenue,
+                "target_revenue": target_revenue,
+                "percentage": percentage,
+                "breakdown": {
+                    "room_revenue": room_revenue,
+                    "apartment_revenue": apartment_revenue,
+                    "event_revenue": event_revenue
+                },
+                "capacity_info": {
+                    "total_rooms": len(hotel.rooms),
+                    "total_apartments": len(hotel.apartments) if hasattr(hotel, 'apartments') else 0,
+                    "total_event_rooms": len(hotel.event_rooms) if hasattr(hotel, 'event_rooms') else 0
+                }
+            })
+        
+        return jsonify({
+            "success": True,
+            "data": revenue_data,
+            "summary": {
+                "total_hotels": len(revenue_data),
+                "total_current_revenue": sum(item["current_revenue"] for item in revenue_data),
+                "total_target_revenue": sum(item["target_revenue"] for item in revenue_data),
+                "overall_percentage": round((sum(item["current_revenue"] for item in revenue_data) / sum(item["target_revenue"] for item in revenue_data)) * 100) if sum(item["target_revenue"] for item in revenue_data) > 0 else 0
+            }
+        })
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500    
+    
+    
+    
+    
+    
+
+
+
+
+
+
+
