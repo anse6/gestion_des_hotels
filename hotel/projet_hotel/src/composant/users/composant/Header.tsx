@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { FaUserCircle, FaSignOutAlt, FaBars, FaTimes } from 'react-icons/fa';
 import { useAuth } from './../../authentification/hooks/useAuth';
 
@@ -27,73 +27,60 @@ const Header: React.FC = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+    `px-2 py-1 lg:px-3 lg:py-2 rounded-lg font-medium transition duration-300 text-xs lg:text-sm ${
+      isActive ? 'bg-white text-blue-800' : 'hover:bg-white hover:text-blue-800'
+    }`;
+
   return (
-    <header className="bg-gradient-to-r from-blue-800 to-blue-600 text-white shadow-lg">
+    <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-blue-800 to-blue-600 text-white shadow-lg">
       <div className="container mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-4">
-            <Link 
-              to={isLoggedIn && userRole !== 'user' ? '/' : '/users'} 
+            <NavLink
+              to={isLoggedIn && userRole !== 'user' ? '/' : '/users'}
               className="text-xl md:text-2xl font-bold hover:text-blue-200 transition duration-300 flex items-center"
             >
-              
               <span className="hidden sm:inline">
-                 Anseehoʊ.t̬əl<span className="text-blue-500">T</span> {/* Signature avec le T stylisé */}
+                Anseehoʊ.t̬əl<span className="text-blue-500">T</span>
               </span>
               <span className="sm:hidden">
-                A<span className="text-blue-500">T</span> {/* Version abrégée */}
+                A<span className="text-blue-500">T</span>
               </span>
-            </Link>
+            </NavLink>
           </div>
-          
-          {/* Menu Desktop (visible à partir de md) */}
+
+          {/* Menu Desktop */}
           <nav className="hidden md:block">
             <ul className="flex items-center space-x-2 lg:space-x-4">
               <li>
-                <Link 
-                  to={isLoggedIn && userRole !== 'user' ? '/' : '/users'} 
-                  className="px-2 py-1 lg:px-3 lg:py-2 bg-white text-blue-800 rounded-lg font-medium hover:bg-blue-100 transition duration-300 text-xs lg:text-sm"
-                >
+                <NavLink to={isLoggedIn && userRole !== 'user' ? '/' : '/users'} className={navLinkClass}>
                   Accueil
-                </Link>
+                </NavLink>
               </li>
-              
               <li>
-                <Link 
-                  to="/about" 
-                  className="px-2 py-1 lg:px-3 lg:py-2 hover:bg-white hover:text-blue-800 rounded-lg font-medium transition duration-300 text-xs lg:text-sm"
-                >
+                <NavLink to="/about" className={navLinkClass}>
                   À propos
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link 
-                  to="/services" 
-                  className="px-2 py-1 lg:px-3 lg:py-2 hover:bg-white hover:text-blue-800 rounded-lg font-medium transition duration-300 text-xs lg:text-sm"
-                >
+                <NavLink to="/services" className={navLinkClass}>
                   Services
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link 
-                  to="/contact" 
-                  className="px-2 py-1 lg:px-3 lg:py-2 hover:bg-white hover:text-blue-800 rounded-lg font-medium transition duration-300 text-xs lg:text-sm"
-                >
+                <NavLink to="/contact" className={navLinkClass}>
                   Contact
-                </Link>
+                </NavLink>
               </li>
-              
               {isLoggedIn && (
                 <li>
-                  <Link 
-                    to="/my_reservation" 
-                    className="px-2 py-1 lg:px-3 lg:py-2 hover:bg-white hover:text-blue-800 rounded-lg font-medium transition duration-300 text-xs lg:text-sm"
-                  >
-                    mes Réservations
-                  </Link>
+                  <NavLink to="/my_reservation" className={navLinkClass}>
+                    Mes réservations
+                  </NavLink>
                 </li>
               )}
-              
+
               {isLoggedIn ? (
                 <li className="flex items-center space-x-2 lg:space-x-4">
                   <div className="hidden lg:flex items-center space-x-3 bg-blue-700/50 px-3 lg:px-4 py-1 lg:py-2 rounded-lg">
@@ -110,7 +97,7 @@ const Header: React.FC = () => {
                       <FaUserCircle className="text-sm lg:text-xl" />
                     </div>
                   </div>
-                  
+
                   <button
                     onClick={handleLogout}
                     disabled={isLoading}
@@ -133,8 +120,8 @@ const Header: React.FC = () => {
               )}
             </ul>
           </nav>
-          
-          {/* Menu Mobile (visible en dessous de md) */}
+
+          {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center">
             {isLoggedIn && (
               <div className="flex items-center mr-4">
@@ -143,70 +130,47 @@ const Header: React.FC = () => {
                 </div>
               </div>
             )}
-            
-            <button 
-              onClick={toggleMenu}
-              className="text-white focus:outline-none"
-            >
+            <button onClick={toggleMenu} className="text-white focus:outline-none">
               {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
             </button>
           </div>
         </div>
-        
-        {/* Menu Mobile déroulant */}
+
+        {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden mt-4 pb-4">
             <ul className="flex flex-col space-y-3">
               <li>
-                <Link 
-                  to={isLoggedIn && userRole !== 'user' ? '/' : '/users'} 
-                  className="block px-4 py-2 bg-white text-blue-800 rounded-lg font-medium hover:bg-blue-100 transition duration-300"
+                <NavLink
+                  to={isLoggedIn && userRole !== 'user' ? '/' : '/users'}
+                  className={navLinkClass}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Accueil
-                </Link>
+                </NavLink>
               </li>
-              
               <li>
-                <Link 
-                  to="/about" 
-                  className="block px-4 py-2 hover:bg-white hover:text-blue-800 rounded-lg font-medium transition duration-300"
-                  onClick={() => setIsMenuOpen(false)}
-                >
+                <NavLink to="/about" className={navLinkClass} onClick={() => setIsMenuOpen(false)}>
                   À propos
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link 
-                  to="/services" 
-                  className="block px-4 py-2 hover:bg-white hover:text-blue-800 rounded-lg font-medium transition duration-300"
-                  onClick={() => setIsMenuOpen(false)}
-                >
+                <NavLink to="/services" className={navLinkClass} onClick={() => setIsMenuOpen(false)}>
                   Services
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link 
-                  to="/contact" 
-                  className="block px-4 py-2 hover:bg-white hover:text-blue-800 rounded-lg font-medium transition duration-300"
-                  onClick={() => setIsMenuOpen(false)}
-                >
+                <NavLink to="/contact" className={navLinkClass} onClick={() => setIsMenuOpen(false)}>
                   Contact
-                </Link>
+                </NavLink>
               </li>
-              
               {isLoggedIn && (
                 <li>
-                  <Link 
-                    to="/my_reservation" 
-                    className="block px-4 py-2 hover:bg-white hover:text-blue-800 rounded-lg font-medium transition duration-300"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
+                  <NavLink to="/my_reservation" className={navLinkClass} onClick={() => setIsMenuOpen(false)}>
                     Mes réservations
-                  </Link>
+                  </NavLink>
                 </li>
               )}
-              
               {isLoggedIn ? (
                 <>
                   <li className="px-4 py-2 bg-blue-700/50 rounded-lg">
