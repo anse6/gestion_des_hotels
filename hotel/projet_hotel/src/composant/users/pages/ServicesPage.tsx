@@ -44,7 +44,7 @@ const ServicesPage: React.FC = () => {
       id: 2,
       title: "Suite Exécutive",
       description: "Une suite élégante avec espace salon séparé, parfaite pour les voyageurs d'affaires ou ceux qui recherchent plus d'espace.",
-      image: "https://images.unsplash.com/photo-1566669437685-5f63c8edea6d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+      image: "https://images.unsplash.com/photo-1596178065887-1198b6148b2b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
       roomSize: "50 m²",
       capacity: "2 personnes",
       price: "10000 fcfa/nuit",

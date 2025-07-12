@@ -45,15 +45,15 @@ def login():
    
     if not user:
         current_app.logger.warning(f"Utilisateur non trouvé: {data.get('email')}")
-        return jsonify({"error": "Identifiants invalides"}), 401
+        return jsonify({"error": "cette adresse email est introuvables dans notre systeme"}), 402
        
     if not user.check_password(data.get('password')):
         current_app.logger.warning(f"Mot de passe incorrect pour: {data.get('email')}")
-        return jsonify({"error": "Identifiants invalides"}), 401
+        return jsonify({"error": "mot de passe incorrect"}), 401
        
     if not user.is_active:
         current_app.logger.warning(f"Compte inactif: {data.get('email')}")
-        return jsonify({"error": "Compte désactivé"}), 401
+        return jsonify({"error": "Compte désactivé"}), 403
    
     # Connexion réussie
     token = create_access_token(identity=user.email)

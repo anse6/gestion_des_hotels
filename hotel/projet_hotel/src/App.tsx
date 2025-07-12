@@ -18,12 +18,13 @@ import EventConfirmationPage from './composant/users/pages/EventConfirmationPage
 import ApartmentConfirmationPage from './composant/users/pages/ApartmentConfirmationPage';
 import ApartmentReservationPage from './composant/users/pages/ApartmentReservationPage';
 import ReservationsDashboard from './composant/users/pages/ReservationsDashboard';
-import ScrollToTop  from './composant/ScrollToTop';
+import ScrollToTop from './composant/ScrollToTop';
 import Scanner from './composant/hotel/composant/Scanner';
-import ExemplePage from './composant/hotel/composant/Qrpep';
+//import ExemplePage from './composant/hotel/composant/Qrpep';
 import LoginLayoutrest from './composant/authentification/LoginLayoutrest';
 import LoginLayoutrestcover from './composant/authentification/LoginLayoutrestcover';
 import LoginLayoutresst from './composant/authentification/LoginLayoutresst';
+import ChatInterface from './composant/users/composant/ChatInterface';
 
 const queryClient = new QueryClient();
 
@@ -32,27 +33,27 @@ const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <Router>
         <ScrollToTop />
+        <main className="mt-20 px-4">
         <Routes>
           {/* Route publique - Page de connexion */}
           <Route path="/login" element={<LoginLayout />} />
 
-           <Route path="/register" element={<LoginLayoutrestcover />} />
+          <Route path="/register" element={<LoginLayoutrestcover />} />
 
-          <Route path="/forgotpassword" element={<LoginLayoutrest />} />//LoginLayoutresst
+          <Route path="/forgotpassword" element={<LoginLayoutrest />} />
 
           <Route path="/resst-password" element={<LoginLayoutresst />} />
 
-          
           {/* Page publique principale */}
           <Route path="/users" element={<Userpep />} />
 
-          <Route path="/scannerqr" element={<ExemplePage />} /> 
+          <Route path="/chat" element={<ChatInterface />} />
 
-          <Route path="/scanner" element={<Scanner />} /> /
-          
+          <Route path="/scanner" element={<Scanner />} />
+
           {/* Redirection par défaut vers la page publique principale */}
           <Route path="/" element={<Navigate to="/users" replace />} />
-          
+
           {/* Routes protégées */}
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
@@ -69,11 +70,9 @@ const App: React.FC = () => {
             <Route path="/confirmation-evenement" element={<EventConfirmationPage />} />
             <Route path="/reservation-appartement/:apartmentId" element={<ApartmentReservationPage />} />
             <Route path="/confirmation-appartement" element={<ApartmentConfirmationPage />} />
-      
-            
-
           </Route>
         </Routes>
+        </main>
       </Router>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>

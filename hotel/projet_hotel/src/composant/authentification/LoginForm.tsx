@@ -1,7 +1,7 @@
 // src/components/LoginForm.tsx
 import React, { useState } from 'react';
-import { useAuth } from './hooks/useAuth';
-import type { LoginCredentials } from './types/auth';
+import { useAuth } from './hooks/useAuth'; // Adjusted path if needed
+import type { LoginCredentials } from './types/auth'; // Adjusted path if needed
 import { Link } from 'react-router-dom';
 
 const LoginForm: React.FC = () => {
@@ -28,8 +28,9 @@ const LoginForm: React.FC = () => {
   return (
     <div className="w-full max-w-md">
       <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Connexion</h2>
-      
+
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Error message display */}
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
             {error.message}
@@ -66,22 +67,21 @@ const LoginForm: React.FC = () => {
           />
         </div>
 
-         <div className="text-center mt-6">
-        <Link
+        <div className="text-center mt-6 -ml-75">
+          <Link
             to="/forgotpassword"
-            className="text-indigo-600 hover:text-indigo-800 font-medium transition duration-200 -ml-75"
-        >
-             mot de passe oublié ?
-        </Link>
+            className="text-indigo-600 hover:text-indigo-800 font-medium transition duration-200" // Adjusted class for general centering
+          >
+            Mot de passe oublié ?
+          </Link>
         </div>
-         <div className="text-center mt-6">
-        <Link
-        to="/register"
-        className="text-indigo-600 hover:text-indigo-800 font-medium transition duration-200 -ml-78"
-      >
-        Créez votre compte
-      </Link>
-
+        <div className="text-center mt-6 -ml-79">
+          <Link
+            to="/register"
+            className="text-indigo-600 hover:text-indigo-800 font-medium transition duration-200" // Adjusted class for general centering
+          >
+            Créez votre compte
+          </Link>
         </div>
 
         <div>

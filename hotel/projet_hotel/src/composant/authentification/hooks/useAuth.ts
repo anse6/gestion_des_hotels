@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { authApi, setAuthToken } from '../services/api';
-import type { LoginResponse, LoginCredentials, AuthError } from '../types/auth';
+import type { LoginResponse, LoginCredentials, AuthError } from '../types/auth'; // Ensure AuthError is correctly typed
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -40,6 +40,7 @@ export const useAuth = () => {
           }
         } catch (error) {
           console.error("Erreur lors de la récupération de l'hôtel:", error);
+          // Consider handling this more gracefully, e.g., redirecting or showing a specific toast
         }
       }
 
@@ -52,7 +53,7 @@ export const useAuth = () => {
           navigate('/hotel');
           break;
         case 'user':
-          navigate('/users');
+          navigate('/users'); // Assuming /users is the public landing or user-specific page
           break;
         default:
           navigate('/');
@@ -61,31 +62,30 @@ export const useAuth = () => {
       toast.success(`Bienvenue ${data.name}!`);
     },
     onError: (error) => {
-      toast.error(error.message || 'Échec de la connexion');
+      // Access error message based on how your AuthError is structured
+      // axios errors often have a 'response.data.message' property
+      const errorMessage = error.message || 'Échec de la connexion. Veuillez vérifier vos identifiants.';
+      toast.error(errorMessage);
+      console.error("Login error:", error); // Log full error for debugging
     }
   });
 
   const logout = () => {
-    const userRole = localStorage.getItem('userRole');
-    
-    setAuthToken(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('userName');
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('hotelId');
-    localStorage.removeItem('hotelName');
+    const userRole = localStorage.getItem('userRole'); // Capture role before clearing storage
+
+    setAuthToken(null); // Remove token from Axios defaults
+    localStorage.clear(); // Clear all auth-related items
     queryClient.removeQueries({ queryKey: ['user'] });
     queryClient.removeQueries({ queryKey: ['hotel'] });
-    queryClient.clear();
-    
+    queryClient.clear(); // Clear all React Query cache
+
     // Redirection différente selon le rôle
     if (userRole === 'user') {
-      navigate('/users');
+      navigate('/users'); // Or a specific logout landing page for users
     } else {
-      navigate('/');
+      navigate('/login'); // Redirect to login page for admins/superadmins after logout
     }
-    
+
     toast.success('Déconnexion réussie');
   };
 

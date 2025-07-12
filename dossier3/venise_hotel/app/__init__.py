@@ -33,6 +33,9 @@ def create_app():
     app.register_blueprint(personnel_bp)
     from app.modules.contact.routes import contact_bp
     app.register_blueprint(contact_bp)
+    
+    from app.modules.chatbot.views import chatbot_bp
+    app.register_blueprint(chatbot_bp)
 
     @app.route('/')
     def index():

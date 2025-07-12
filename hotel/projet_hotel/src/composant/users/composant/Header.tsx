@@ -73,6 +73,11 @@ const Header: React.FC = () => {
                   Contact
                 </NavLink>
               </li>
+               <li>
+                <NavLink to="/chat" className={navLinkClass}>
+                  Chat
+                </NavLink>
+              </li>
               {isLoggedIn && (
                 <li>
                   <NavLink to="/my_reservation" className={navLinkClass}>
