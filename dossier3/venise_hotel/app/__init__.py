@@ -31,6 +31,8 @@ def create_app():
     
     from app.modules.personnel.routes import personnel_bp
     app.register_blueprint(personnel_bp)
+    from app.modules.contact.routes import contact_bp
+    app.register_blueprint(contact_bp)
 
     @app.route('/')
     def index():

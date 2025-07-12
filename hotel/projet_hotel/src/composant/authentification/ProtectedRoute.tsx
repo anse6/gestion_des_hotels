@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 
 type User = {
   role: string;
-  // add other user properties if needed
+ 
 };
 
 const ProtectedRoute: React.FC<{ adminOnly?: boolean }> = ({ adminOnly = false }) => {

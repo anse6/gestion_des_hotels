@@ -31,6 +31,7 @@ const ReservationsList = () => {
   const [reservationToDelete, setReservationToDelete] = useState<Reservation | null>(null);
   const [reservationToEdit, setReservationToEdit] = useState<Reservation | null>(null);
   const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [filteredReservations, setFilteredReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -56,6 +57,41 @@ const ReservationsList = () => {
     fetchReservations();
   }, []);
 
+  useEffect(() => {
+    // Apply frontend filtering based on search term, status, type, and date range
+    let filtered = reservations;
+
+    // Filter by type
+    if (activeFilter !== 'toutes') {
+      filtered = filtered.filter(reservation => reservation.type === activeFilter);
+    }
+
+    // Filter by search term
+    if (searchTerm) {
+      const lowerSearch = searchTerm.toLowerCase();
+      filtered = filtered.filter(reservation =>
+        reservation.nom?.toLowerCase().includes(lowerSearch) ||
+        reservation.prenom?.toLowerCase().includes(lowerSearch) ||
+        reservation.email?.toLowerCase().includes(lowerSearch)
+      );
+    }
+
+    // Filter by status
+    if (statusFilter !== 'tous') {
+      filtered = filtered.filter(reservation => reservation.statut === statusFilter);
+    }
+
+    // Filter by date range
+    if (dateRange.start && dateRange.end) {
+      filtered = filtered.filter(reservation => {
+        const reservationDate = reservation.date_evenement || reservation.dates?.split(' au ')[0];
+        return reservationDate && reservationDate >= dateRange.start && reservationDate <= dateRange.end;
+      });
+    }
+
+    setFilteredReservations(filtered);
+  }, [reservations, searchTerm, activeFilter, statusFilter, dateRange]);
+
   const fetchReservations = async () => {
     try {
       setLoading(true);
@@ -63,31 +99,13 @@ const ReservationsList = () => {
       
       const [roomsRes, apartmentsRes, eventRoomsRes] = await Promise.all([
         axios.get('http://localhost:5000/api/reservations/rooms', {
-          headers: { Authorization: `Bearer ${token}` },
-          params: {
-            search: searchTerm,
-            status: statusFilter !== 'tous' ? statusFilter : undefined,
-            from_date: dateRange.start,
-            to_date: dateRange.end
-          }
+          headers: { Authorization: `Bearer ${token}` }
         }),
         axios.get('http://localhost:5000/api/reservations/apartments', {
-          headers: { Authorization: `Bearer ${token}` },
-          params: {
-            search: searchTerm,
-            status: statusFilter !== 'tous' ? statusFilter : undefined,
-            from_date: dateRange.start,
-            to_date: dateRange.end
-          }
+          headers: { Authorization: `Bearer ${token}` }
         }),
         axios.get('http://localhost:5000/api/reservations/event-rooms', {
-          headers: { Authorization: `Bearer ${token}` },
-          params: {
-            search: searchTerm,
-            status: statusFilter !== 'tous' ? statusFilter : undefined,
-            from_date: dateRange.start,
-            to_date: dateRange.end
-          }
+          headers: { Authorization: `Bearer ${token}` }
         })
       ]);
 
@@ -163,105 +181,97 @@ const ReservationsList = () => {
     setShowEditModal(true);
   };
 
-const handleUpdateReservation = async () => {
-  if (!reservationToEdit) return;
+  const handleUpdateReservation = async () => {
+    if (!reservationToEdit) return;
 
-  try {
-    const token = localStorage.getItem('token');
-    let endpoint = '';
-    let data: any = {};
+    try {
+      const token = localStorage.getItem('token');
+      let endpoint = '';
+      let data: any = {};
 
-    // Préparer les données différemment selon le type de réservation
-    if (reservationToEdit.type === 'salle') {
-      data = {
-        event_room_id: reservationToEdit.event_room_id || reservationToEdit.id,
-        nom: reservationToEdit.nom,
-        prenom: reservationToEdit.prenom,
-        email: reservationToEdit.email || '',
-        type_evenement: reservationToEdit.type_evenement || 'autre',
-        date_evenement: reservationToEdit.date_evenement,
-        heure_debut: reservationToEdit.heure_debut || '',
-        heure_fin: reservationToEdit.heure_fin || '',
-        nombre_invites: reservationToEdit.nombre_invites,
-        methode_paiement: reservationToEdit.methode_paiement?.trim(),
-        prix_total: reservationToEdit.prix_total?.toString(),
-        notes: reservationToEdit.notes?.trim(),
-        statut: reservationToEdit.statut?.toLowerCase()
-      };
+      if (reservationToEdit.type === 'salle') {
+        data = {
+          event_room_id: reservationToEdit.event_room_id || reservationToEdit.id,
+          nom: reservationToEdit.nom,
+          prenom: reservationToEdit.prenom,
+          email: reservationToEdit.email || '',
+          type_evenement: reservationToEdit.type_evenement || 'autre',
+          date_evenement: reservationToEdit.date_evenement,
+          heure_debut: reservationToEdit.heure_debut || '',
+          heure_fin: reservationToEdit.heure_fin || '',
+          nombre_invites: reservationToEdit.nombre_invites,
+          methode_paiement: reservationToEdit.methode_paiement?.trim(),
+          prix_total: reservationToEdit.prix_total?.toString(),
+          notes: reservationToEdit.notes?.trim(),
+          statut: reservationToEdit.statut?.toLowerCase()
+        };
 
-      endpoint = `http://localhost:5000/api/reservations/event-rooms/${reservationToEdit.id}`;
-    } else {
-      // Pour chambres et appartements
-      data = {
-        nom: reservationToEdit.nom,
-        prenom: reservationToEdit.prenom,
-        email: reservationToEdit.email || '',
-        nombre_personnes: reservationToEdit.nombre_personnes,
-        heure_debut: reservationToEdit.heure_debut,
-        heure_fin: reservationToEdit.heure_fin,
-        methode_paiement: reservationToEdit.methode_paiement?.trim(),
-        prix_total: reservationToEdit.prix_total?.toString(),
-        notes: reservationToEdit.notes?.trim(),
-        statut: reservationToEdit.statut?.toLowerCase()
-      };
-
-      if (reservationToEdit.type === 'chambre') {
-        data.room_id = reservationToEdit.room_id || reservationToEdit.id;
-        endpoint = `http://localhost:5000/api/reservations/rooms/${reservationToEdit.id}`;
+        endpoint = `http://localhost:5000/api/reservations/event-rooms/${reservationToEdit.id}`;
       } else {
-        data.apartment_id = reservationToEdit.apartment_id || reservationToEdit.id;
-        endpoint = `http://localhost:5000/api/reservations/apartments/${reservationToEdit.id}`;
+        data = {
+          nom: reservationToEdit.nom,
+          prenom: reservationToEdit.prenom,
+          email: reservationToEdit.email || '',
+          nombre_personnes: reservationToEdit.nombre_personnes,
+          heure_debut: reservationToEdit.heure_debut,
+          heure_fin: reservationToEdit.heure_fin,
+          methode_paiement: reservationToEdit.methode_paiement?.trim(),
+          prix_total: reservationToEdit.prix_total?.toString(),
+          notes: reservationToEdit.notes?.trim(),
+          statut: reservationToEdit.statut?.toLowerCase()
+        };
+
+        if (reservationToEdit.type === 'chambre') {
+          data.room_id = reservationToEdit.room_id || reservationToEdit.id;
+          endpoint = `http://localhost:5000/api/reservations/rooms/${reservationToEdit.id}`;
+        } else {
+          data.apartment_id = reservationToEdit.apartment_id || reservationToEdit.id;
+          endpoint = `http://localhost:5000/api/reservations/apartments/${reservationToEdit.id}`;
+        }
       }
-    }
 
-    console.log('Données envoyées:', data);
+      console.log('Données envoyées:', data);
 
-    const response = await axios.put(endpoint, data, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    setReservations(prev =>
-      prev.map(r =>
-        r.id === reservationToEdit.id ? { ...response.data, type: reservationToEdit.type } : r
-      )
-    );
-    setShowEditModal(false);
-    setReservationToEdit(null);
-  } catch (err) {
-    if (err && typeof err === 'object' && 'response' in err) {
-      const errorResponse = (err as any).response;
-      console.error('Erreur détaillée:', {
-        error: err,
-        response: errorResponse?.data
+      const response = await axios.put(endpoint, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
-      setError(`Erreur lors de la mise à jour: ${errorResponse?.data?.error || (err as any).message}`);
-    } else {
-      console.error('Erreur détaillée:', err);
-      setError(`Erreur lors de la mise à jour: ${(err as any).message || 'Erreur inconnue'}`);
-    }
-  }
-};
 
+      setReservations(prev =>
+        prev.map(r =>
+          r.id === reservationToEdit.id ? { ...response.data, type: reservationToEdit.type } : r
+        )
+      );
+      setShowEditModal(false);
+      setReservationToEdit(null);
+    } catch (err) {
+      if (err && typeof err === 'object' && 'response' in err) {
+        const errorResponse = (err as any).response;
+        console.error('Erreur détaillée:', {
+          error: err,
+          response: errorResponse?.data
+        });
+        setError(`Erreur lors de la mise à jour: ${errorResponse?.data?.error || (err as any).message}`);
+      } else {
+        console.error('Erreur détaillée:', err);
+        setError(`Erreur lors de la mise à jour: ${(err as any).message || 'Erreur inconnue'}`);
+      }
+    }
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchReservations();
+    // Filtering is now handled by useEffect
   };
 
   const handleResetFilters = () => {
     setSearchTerm('');
     setStatusFilter('tous');
     setDateRange({ start: '', end: '' });
-    fetchReservations();
+    setActiveFilter('toutes');
   };
-
-  const filteredReservations = reservations.filter(reservation => {
-    if (activeFilter === 'toutes') return true;
-    return reservation.type === activeFilter;
-  });
 
   const getStatusColor = (statut: string) => {
     switch (statut.toLowerCase()) {
@@ -602,64 +612,64 @@ const handleUpdateReservation = async () => {
                 </select>
               </div>
               
-{reservationToEdit.type === 'chambre' || reservationToEdit.type === 'appartement' ? (
-  <>
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">Nombre de personnes</label>
-      <input
-        type="number"
-        className="w-full border border-gray-300 rounded-lg px-3 py-2"
-        value={reservationToEdit.nombre_personnes || ''}
-        onChange={(e) => setReservationToEdit({
-          ...reservationToEdit,
-          nombre_personnes: parseInt(e.target.value) || 0
-        })}
-      />
-    </div>
-  </>
-) : (
-  <div>
-    <label className="block text-sm font-medium text-gray-700 mb-1">Nombre d'invités</label>
-    <input
-      type="number"
-      className="w-full border border-gray-300 rounded-lg px-3 py-2"
-      value={reservationToEdit.nombre_invites || ''}
-      onChange={(e) => setReservationToEdit({
-        ...reservationToEdit,
-        nombre_invites: parseInt(e.target.value) || 0
-      })}
-    />
-  </div>
-)}
+              {reservationToEdit.type === 'chambre' || reservationToEdit.type === 'appartement' ? (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Nombre de personnes</label>
+                    <input
+                      type="number"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      value={reservationToEdit.nombre_personnes || ''}
+                      onChange={(e) => setReservationToEdit({
+                        ...reservationToEdit,
+                        nombre_personnes: parseInt(e.target.value) || 0
+                      })}
+                    />
+                  </div>
+                </>
+              ) : (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nombre d'invités</label>
+                  <input
+                    type="number"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    value={reservationToEdit.nombre_invites || ''}
+                    onChange={(e) => setReservationToEdit({
+                      ...reservationToEdit,
+                      nombre_invites: parseInt(e.target.value) || 0
+                    })}
+                  />
+                </div>
+              )}
 
-{reservationToEdit.type === 'salle' && (
-  <>
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">Heure de début</label>
-      <input
-        type="time"
-        className="w-full border border-gray-300 rounded-lg px-3 py-2"
-        value={reservationToEdit.heure_debut || ''}
-        onChange={(e) => setReservationToEdit({
-          ...reservationToEdit,
-          heure_debut: e.target.value
-        })}
-      />
-    </div>
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">Heure de fin</label>
-      <input
-        type="time"
-        className="w-full border border-gray-300 rounded-lg px-3 py-2"
-        value={reservationToEdit.heure_fin || ''}
-        onChange={(e) => setReservationToEdit({
-          ...reservationToEdit,
-          heure_fin: e.target.value
-        })}
-      />
-    </div>
-  </>
-)}
+              {reservationToEdit.type === 'salle' && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Heure de début</label>
+                    <input
+                      type="time"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      value={reservationToEdit.heure_debut || ''}
+                      onChange={(e) => setReservationToEdit({
+                        ...reservationToEdit,
+                        heure_debut: e.target.value
+                      })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Heure de fin</label>
+                    <input
+                      type="time"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      value={reservationToEdit.heure_fin || ''}
+                      onChange={(e) => setReservationToEdit({
+                        ...reservationToEdit,
+                        heure_fin: e.target.value
+                      })}
+                    />
+                  </div>
+                </>
+              )}
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Méthode de paiement</label>

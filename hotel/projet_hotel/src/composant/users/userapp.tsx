@@ -176,35 +176,7 @@ const Userpep: React.FC = () => {
           )}
         </section>
 
-        {/* About Section */}
-        <section className="bg-blue-50 py-16">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-col lg:flex-row items-center">
-              <div className="lg:w-1/2 mb-8 lg:mb-0 lg:pr-12">
-                <img 
-                  src="https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" 
-                  alt="Paysage" 
-                  className="rounded-lg shadow-xl w-full h-auto"
-                />
-              </div>
-              <div className="lg:w-1/2">
-                <h2 className="text-3xl font-bold text-gray-800 mb-6">L'hospitalité à son meilleur</h2>
-                <p className="text-lg text-gray-600 mb-6">
-                  Nos destinations vous accueillent avec une hospitalité légendaire. 
-                  Nos hôtels reflètent cette richesse à travers des designs inspirés 
-                  des traditions locales et des services de classe mondiale.
-                </p>
-                <p className="text-lg text-gray-600 mb-6">
-                  Que vous visitiez pour les affaires ou le plaisir, nos établissements 
-                  vous offriront un havre de paix et de confort après vos explorations.
-                </p>
-                <button className="bg-blue-700 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-800 transition duration-300">
-                  Découvrir notre histoire
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
+       
         <Testimonials />
       </div>
       <Footer />

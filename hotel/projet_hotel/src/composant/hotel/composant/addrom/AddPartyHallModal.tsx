@@ -184,7 +184,7 @@ const PartyHallModal: React.FC<PartyHallModalProps> = ({
 
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-medium mb-2">
-              Prix de location (€)
+              Prix de location (fcfa)
             </label>
             <input
               type="number"

@@ -188,7 +188,7 @@ const EditRoomModal: React.FC<EditRoomModalProps> = ({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Prix par nuit (€) *
+                  Prix par nuit (fcfa) *
                 </label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">€</span>

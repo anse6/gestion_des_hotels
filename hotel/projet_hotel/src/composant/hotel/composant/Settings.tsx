@@ -1,6 +1,89 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+
+interface HotelData {
+  id: number;
+  admin_id: number;
+  name: string;
+  email: string;
+  phone: string;
+  description: string;
+  city: string;
+  country: string;
+  stars: number;
+  website: string;
+  created_at: string;
+}
 
 const Parametres: React.FC = () => {
+  const [hotel, setHotel] = useState<HotelData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchHotelData = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem("token"); // Récupère le token du localStorage
+
+        if (!token) {
+          setError("Aucun token trouvé. Veuillez vous connecter.");
+          setLoading(false);
+          return;
+        }
+
+        const response = await axios.get<HotelData[]>(
+          "http://localhost:5000/api/hotel/my-hotels",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Ajoute le token dans l'en-tête Authorization
+            },
+          }
+        );
+
+        // L'API retourne un tableau, nous prenons le premier élément s'il existe
+        if (response.data && response.data.length > 0) {
+          setHotel(response.data[0]);
+        } else {
+          setError("Aucune donnée d'hôtel trouvée.");
+        }
+      } catch (err) {
+        if (axios.isAxiosError(err)) {
+          setError(
+            err.response?.data?.message ||
+              "Erreur lors de la récupération des données de l'hôtel."
+          );
+        } else {
+          setError("Une erreur inattendue est survenue.");
+        }
+        console.error("Erreur API:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHotelData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="p-6 text-center text-gray-600">Chargement des données de l'hôtel...</div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 text-center text-red-600">Erreur : {error}</div>
+    );
+  }
+
+  // Si hotel est null ici, c'est qu'il n'y a pas de données après le chargement
+  if (!hotel) {
+    return (
+      <div className="p-6 text-center text-gray-600">Aucune information d'hôtel disponible.</div>
+    );
+  }
+
   return (
     <div className="p-6">
       <div className="mb-6">
@@ -8,7 +91,7 @@ const Parametres: React.FC = () => {
         <p className="text-gray-600">Gérez les paramètres de votre système hôtelier</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="w-full h-screen p-6 pb-15">
         <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100">
             <h3 className="font-semibold text-gray-800">Informations sur l'hôtel</h3>
@@ -22,7 +105,8 @@ const Parametres: React.FC = () => {
                 <input
                   type="text"
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  defaultValue="Grand Hôtel & Suites"
+                  defaultValue={hotel.name || ""}
+                  readOnly // Rend le champ en lecture seule car ce composant n'implémente pas la modification
                 />
               </div>
               <div>
@@ -32,7 +116,8 @@ const Parametres: React.FC = () => {
                 <input
                   type="text"
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  defaultValue="Grand Hospitality Inc."
+                  defaultValue={hotel.name || ""} // L'API ne fournit pas de "nom légal d'entreprise", j'utilise le nom de l'hôtel pour l'exemple
+                  readOnly
                 />
               </div>
               <div>
@@ -42,7 +127,8 @@ const Parametres: React.FC = () => {
                 <input
                   type="email"
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  defaultValue="info@grandhotel.com"
+                  defaultValue={hotel.email || ""}
+                  readOnly
                 />
               </div>
               <div>
@@ -52,7 +138,8 @@ const Parametres: React.FC = () => {
                 <input
                   type="tel"
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  defaultValue="+1 (555) 123-4567"
+                  defaultValue={hotel.phone || ""}
+                  readOnly
                 />
               </div>
               <div className="md:col-span-2">
@@ -62,32 +149,38 @@ const Parametres: React.FC = () => {
                 <input
                   type="text"
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3"
-                  defaultValue="123 Luxury Avenue"
+                  // eslint-disable-next-line no-constant-binary-expression
+                  defaultValue={`${hotel.city}, ${hotel.country}` || ""} // Concatène ville et pays pour l'adresse
+                  readOnly
                 />
                 <div className="grid grid-cols-2 gap-3">
                   <input
                     type="text"
                     placeholder="Ville"
                     className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    defaultValue="New York"
+                    defaultValue={hotel.city || ""}
+                    readOnly
                   />
                   <input
                     type="text"
                     placeholder="État/Province"
                     className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    defaultValue="NY"
+                    defaultValue="" // L'API ne fournit pas l'état/province
+                    readOnly
                   />
                   <input
                     type="text"
                     placeholder="Code postal"
                     className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    defaultValue="10001"
+                    defaultValue="" // L'API ne fournit pas le code postal
+                    readOnly
                   />
                   <input
                     type="text"
                     placeholder="Pays"
                     className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    defaultValue="États-Unis"
+                    defaultValue={hotel.country || ""}
+                    readOnly
                   />
                 </div>
               </div>
@@ -98,92 +191,14 @@ const Parametres: React.FC = () => {
                 <textarea
                   rows={4}
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  defaultValue="Hôtel de luxe au cœur de la ville offrant des hébergements haut de gamme, une cuisine raffinée et un service exceptionnel."
+                  defaultValue={hotel.description || ""}
+                  readOnly
                 ></textarea>
               </div>
             </div>
             <div className="mt-6">
               <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap cursor-pointer !rounded-button">
                 Enregistrer les modifications
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100">
-            <h3 className="font-semibold text-gray-800">Paramètres de paiement</h3>
-          </div>
-          <div className="p-6">
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Devise par défaut
-              </label>
-              <select className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-                <option>Fran cfa</option>
-                <option>EUR - Euro</option>
-                <option>Orange money</option>
-                <option>MTN money</option>
-              </select>
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Méthodes de paiement
-              </label>
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="carte"
-                    className="mr-2"
-                    defaultChecked
-                  />
-                  <label htmlFor="carte">Carte de crédit</label>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="paypal"
-                    className="mr-2"
-                    defaultChecked
-                  />
-                  <label htmlFor="paypal">PayPal</label>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="virement"
-                    className="mr-2"
-                    defaultChecked
-                  />
-                  <label htmlFor="virement">Virement bancaire</label>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="espece"
-                    className="mr-2"
-                    defaultChecked
-                  />
-                  <label htmlFor="espece">Espèces</label>
-                </div>
-              </div>
-            </div>
-            {/* <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Taux de TVA (%)
-              </label>
-              <input
-                type="number"
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                defaultValue="8.5"
-                min="0"
-                step="0.1"
-              />
-            </div> */}
-            <div className="mt-6">
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap cursor-pointer !rounded-button">
-                Enregistrer les paramètres de paiement
               </button>
             </div>
           </div>
